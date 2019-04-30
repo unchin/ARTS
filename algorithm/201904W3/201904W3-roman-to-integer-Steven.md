@@ -54,47 +54,44 @@ Explanation: M = 1000, CM = 900, XC = 90 and IV = 4.
  
 
 ### 解决方案：
+逆序遍历给定的字符串的每一个字符，根据题中的字符表将字符映射为数字，如果小的数在大的数前面就需要拿大的数减去小的数，否则相加。
 
+比如：
+IV，I = 1， V = 5，1 < 5，于是IV = 5 - 1 = 4;
 
-#### 思路：
+II, 第一个 I 是 1，第二个 I 还是 1，两个数相等，于是 II = 1 + 1 = 2;
 
+VI，V = 5， I = 1， 5  > 1，于是VI = 5 + 1 = 6。
 
 #### 算法：
 
 ```
 class Solution {
-public int romanToInt(String s) {
-		int n = s.length();
-		int roman_int = 0;
-		for(int i=0;i<n;i++)
-		{
-			switch(s.charAt(i)) 
-			{
-			case 'I' : roman_int = roman_int + 1;break;
-			case 'V' : roman_int = roman_int + 5;break;
-			case 'X' : roman_int = roman_int + 10;break;
-			case 'L' : roman_int = roman_int + 50;break;
-			case 'C' : roman_int = roman_int + 100;break;
-			case 'D' : roman_int = roman_int + 500;break;
-			case 'M' : roman_int = roman_int + 1000;break;
-			default: System.out.println("default");break;
-			}
+     public int romanToInt(String s) {
+	    if (s == null || s.length()==0) {
+                return 0;
+	    }
+	    Map<Character, Integer> m = new HashMap<Character, Integer>();
+	    m.put('I', 1);
+	    m.put('V', 5);
+	    m.put('X', 10);
+	    m.put('L', 50);
+	    m.put('C', 100);
+	    m.put('D', 500);
+	    m.put('M', 1000);
 
-			if(i!=0)
-			{
-				if(((s.charAt(i)=='V')||(s.charAt(i)=='X'))&&(s.charAt(i-1)=='I')) 
-					roman_int = roman_int-1*2;
-				if(((s.charAt(i)=='L')||(s.charAt(i)=='C'))&&(s.charAt(i-1)=='X'))
-					roman_int = roman_int-10*2;
-				if(((s.charAt(i)=='D')||(s.charAt(i)=='M'))&&(s.charAt(i-1)=='C'))
-					roman_int = roman_int-100*2;
-			}
-		}
-		return roman_int;
+	    int length = s.length();
+	    int result = m.get(s.charAt(length - 1));
+	    for (int i = length - 2; i >= 0; i--) {
+	        if (m.get(s.charAt(i + 1)) <= m.get(s.charAt(i))) {
+	            result += m.get(s.charAt(i));
+	        } else {
+	            result -= m.get(s.charAt(i));
+	        }
+	    }
+	    return result;
 	}
 }
 ```
-
-**复杂度分析：**
 
 
