@@ -1,3 +1,31 @@
+<!-- TOC -->
+
+- [场景](#场景)
+- [解决方案](#解决方案)
+- [定义：什么是 oauth2](#定义什么是-oauth2)
+- [oauth2的四种授权方式](#oauth2的四种授权方式)
+- [oauth角色](#oauth角色)
+- [客户端和服务端](#客户端和服务端)
+- [举例](#举例)
+- [实现](#实现)
+    - [客户端](#客户端)
+        - [登记](#登记)
+        - [项目结构](#项目结构)
+        - [pom添加依赖](#pom添加依赖)
+        - [yml配置文件](#yml配置文件)
+        - [AuthCodeController获取code](#authcodecontroller获取code)
+        - [AccessTokenController服务端回调](#accesstokencontroller服务端回调)
+        - [GetUserInfoController客户端根据access_token获取用户信息](#getuserinfocontroller客户端根据access_token获取用户信息)
+        - [测试](#测试)
+    - [服务端](#服务端)
+        - [用户表](#用户表)
+        - [客户端信息client表](#客户端信息client表)
+        - [Todo](#todo)
+- [源码](#源码)
+- [参考链接](#参考链接)
+
+<!-- /TOC -->
+
 ## 场景
 在登录模块中，需要集成第三方登录，比如微信登录，微博登录等
 

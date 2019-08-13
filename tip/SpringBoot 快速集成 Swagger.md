@@ -1,3 +1,15 @@
+<!-- TOC -->
+
+- [场景与定义](#%e5%9c%ba%e6%99%af%e4%b8%8e%e5%ae%9a%e4%b9%89)
+- [操作步骤](#%e6%93%8d%e4%bd%9c%e6%ad%a5%e9%aa%a4)
+  - [配置pom.xml](#%e9%85%8d%e7%bd%aepomxml)
+  - [添加Swagger配置类](#%e6%b7%bb%e5%8a%a0swagger%e9%85%8d%e7%bd%ae%e7%b1%bb)
+  - [启动类](#%e5%90%af%e5%8a%a8%e7%b1%bb)
+  - [配置controller](#%e9%85%8d%e7%bd%aecontroller)
+  - [Test](#test)
+
+<!-- /TOC -->
+
 ## 场景与定义
 没有API文档工具之前，大家都是手写API文档的（维护起来相当困难），在什么地方书写的都有，有在confluence上写的，有在对应的项目目录下readme.md上写的，每个公司都有每个公司的玩法，无所谓好坏。
 
