@@ -1,4 +1,19 @@
+# Spring Boot 整合 Shiro-登录认证和权限管理
 
+<!-- TOC -->
+
+- [Spring Boot 整合 Shiro-登录认证和权限管理](#spring-boot-%e6%95%b4%e5%90%88-shiro-%e7%99%bb%e5%bd%95%e8%ae%a4%e8%af%81%e5%92%8c%e6%9d%83%e9%99%90%e7%ae%a1%e7%90%86)
+  - [Apache Shiro](#apache-shiro)
+  - [实现方案](#%e5%ae%9e%e7%8e%b0%e6%96%b9%e6%a1%88)
+    - [pom包依赖](#pom%e5%8c%85%e4%be%9d%e8%b5%96)
+    - [RBAC](#rbac)
+    - [Shiro配置](#shiro%e9%85%8d%e7%bd%ae)
+      - [ShiroConfig](#shiroconfig)
+      - [登录认证实现](#%e7%99%bb%e5%bd%95%e8%ae%a4%e8%af%81%e5%ae%9e%e7%8e%b0)
+      - [链接权限的实现](#%e9%93%be%e6%8e%a5%e6%9d%83%e9%99%90%e7%9a%84%e5%ae%9e%e7%8e%b0)
+      - [登录实现](#%e7%99%bb%e5%bd%95%e5%ae%9e%e7%8e%b0)
+
+<!-- /TOC -->
 
 ## Apache Shiro
 What is Apache Shiro?
@@ -35,7 +50,7 @@ Shiro 致力在所有应用环境下实现上述功能，小到命令行应用�
 ```
 
 ### RBAC
-RBAC 是基于角色的访问控制（Role-Based Access Control ）在 RBAC 中，权限与角色相关联，用户通过成为适当角色的成员而得到这些角色的权限。这就极大地简化了权限的管理。这样管理都是层级相互依赖的，权限赋予给角色，而把角色又赋予用户，这样的权限设计很清楚，管理起来很方便。
+RBAC 是基于角色的访问控制（Role-Based Access Control ）在 RBAC 中，权限与角色相关联，用户通过成为适当角色的成员而得到这些角色的权限。这就极大地简化了权限的管理。这样管理都是层级相互依赖的，权限赋予给角色，而把角色又赋予用户，这样的权限设计清楚，管理起来方便。
 
 用户信息
 ```
@@ -167,27 +182,43 @@ INSERT INTO `sys_user_role` (`role_id`,`uid`) VALUES (1,1)
 public class ShiroConfig {
 	@Bean
 	public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager) {
-		System.out.println("ShiroConfiguration.shiroFilter()");
-		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
-		shiroFilterFactoryBean.setSecurityManager(securityManager);
-		//拦截器.
-		Map<String,String> filterChainDefinitionMap = new LinkedHashMap<String,String>();
-		// 配置不会被拦截的链接 顺序判断
-		filterChainDefinitionMap.put("/static/**", "anon");
-		//配置退出 过滤器,其中的具体的退出代码Shiro已经替我们实现了
-		filterChainDefinitionMap.put("/logout", "logout");
-		//<!-- 过滤链定义，从上向下顺序执行，一般将/**放在最为下边 -->:这是一个坑呢，一不小心代码就不好使了;
-		//<!-- authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问-->
-		filterChainDefinitionMap.put("/**", "authc");
-		// 如果不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面
-		shiroFilterFactoryBean.setLoginUrl("/login");
-		// 登录成功后要跳转的链接
-		shiroFilterFactoryBean.setSuccessUrl("/index");
+    ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
+        shiroFilterFactoryBean.setSecurityManager(securityManager());
 
-		//未授权界面;
-		shiroFilterFactoryBean.setUnauthorizedUrl("/403");
-		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
-		return shiroFilterFactoryBean;
+        //拦截器.
+        Map<String,String> filterChainDefinitionMap = new LinkedHashMap<>();
+
+        // 配置不会被拦截的链接 顺序判断
+        //<!-- anon:所有url都可以匿名访问-->
+        filterChainDefinitionMap.put("/docs.html", "anon");
+        filterChainDefinitionMap.put("/user/portalUser/login", "anon");
+
+        //配置退出 过滤器,其中的具体的退出代码Shiro已经替我们实现了
+        filterChainDefinitionMap.put("/logout", "logout");
+
+        //<!-- 过滤链定义，从上向下顺序执行，一般将/**放在最为下边 -->
+        //<!-- authc:所有url都必须认证通过才可以访问-->
+        /*
+         * anon：匿名用户可访问
+         * authc：认证用户可访问
+         * user：使用rememberMe可访问
+         * perms：对应权限可访问
+         * role：对应角色权限可访问
+         **/
+        filterChainDefinitionMap.put("/thinktankExpert/**", "anon");
+
+        // 如果不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面
+        shiroFilterFactoryBean.setLoginUrl("/admin/test");
+
+        // 登录成功后要跳转的链接
+        shiroFilterFactoryBean.setSuccessUrl("/docs.html");
+
+        // 未授权界面
+        shiroFilterFactoryBean.setUnauthorizedUrl("/403");
+
+        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
+
+        return shiroFilterFactoryBean;
 	}
 
 	@Bean
@@ -203,6 +234,20 @@ public class ShiroConfig {
 		securityManager.setRealm(myShiroRealm());
 		return securityManager;
 	}
+
+    /**
+    * 开启shiro aop注解支持.
+    *
+    * @param securityManager
+    * @return
+    */
+    @Bean
+    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(SecurityManager securityManager) {
+        AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
+        authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
+        return authorizationAttributeSourceAdvisor;
+    }
+    
 }
 ```
 
@@ -254,7 +299,7 @@ protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
     return authenticationInfo;
 }
 ```
-**链接权限的实现**
+#### 链接权限的实现
 
 Shiro 的权限授权是通过继承AuthorizingRealm抽象类，重载doGetAuthorizationInfo();当访问到页面的时候，链接配置了相应的权限或者 Shiro 标签才会执行此方法否则不会执行，所以如果只是简单的身份认证没有权限的控制的话，那么这个方法可以不进行实现，直接返回 null 即可。在这个方法中主要是使用类：SimpleAuthorizationInfo进行角色的添加和权限的添加。
 
@@ -282,7 +327,7 @@ authorizationInfo.setStringPermissions(stringPermissions);
 
 就是说如果在shiro配置文件中添加了filterChainDefinitionMap.put(“/add”, “perms[权限添加]”);就说明访问/add这个链接必须要有“权限添加”这个权限才可以访问，如果在shiro配置文件中添加了filterChainDefinitionMap.put(“/add”, “roles[100002]，perms[权限添加]”);就说明访问/add这个链接必须要有“权限添加”这个权限和具有“100002”这个角色才可以访问。
 
-登录实现
+#### 登录实现
 
 登录过程其实只是处理异常的相关信息，具体的登录验证交给 Shiro 来处理。
 ```
