@@ -12,6 +12,9 @@
       - [登录认证实现](#%e7%99%bb%e5%bd%95%e8%ae%a4%e8%af%81%e5%ae%9e%e7%8e%b0)
       - [链接权限的实现](#%e9%93%be%e6%8e%a5%e6%9d%83%e9%99%90%e7%9a%84%e5%ae%9e%e7%8e%b0)
       - [登录实现](#%e7%99%bb%e5%bd%95%e5%ae%9e%e7%8e%b0)
+      - [前后端分离](#%e5%89%8d%e5%90%8e%e7%ab%af%e5%88%86%e7%a6%bb)
+      - [源码](#%e6%ba%90%e7%a0%81)
+      - [参考链接](#%e5%8f%82%e8%80%83%e9%93%be%e6%8e%a5)
 
 <!-- /TOC -->
 
@@ -116,16 +119,7 @@ CREATE TABLE `sys_user_role` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '编号',
   `uid` int(11) NOT NULL COMMENT '用户编号',
   `role_id` int(11) NOT NULL COMMENT '角色编号',
-  `create_date` datetime DEFAULT NULL COMMENT '创建时间',
-  `operate_date` datetime DEFAULT NULL COMMENT '操作时间',
-  `creator` varchar(40) DEFAULT NULL COMMENT '创建用户',
-  `operator` varchar(40) DEFAULT NULL COMMENT '操作用户',
-  `remark` varchar(100) DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`id`),
-  KEY `FKhh52n8vd4ny9ff4x9fb8v65qx` (`role_id`),
-  KEY `FKgkmyslkrfeyn9ukmolvek8b8f` (`uid`),
-  CONSTRAINT `FKgkmyslkrfeyn9ukmolvek8b8f` FOREIGN KEY (`uid`) REFERENCES `user_info` (`uid`),
-  CONSTRAINT `FKhh52n8vd4ny9ff4x9fb8v65qx` FOREIGN KEY (`role_id`) REFERENCES `sys_role` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='用户角色表';
 
 ```
@@ -136,16 +130,6 @@ CREATE TABLE `sys_role_permission` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '编号',
   `permission_id` int(11) NOT NULL COMMENT '角色权限',
   `role_id` int(11) NOT NULL COMMENT '角色编号',
-  `create_date` datetime DEFAULT NULL COMMENT '创建时间',
-  `operate_date` datetime DEFAULT NULL COMMENT '操作时间',
-  `creator` varchar(40) DEFAULT NULL COMMENT '创建用户',
-  `operator` varchar(40) DEFAULT NULL COMMENT '操作用户',
-  `remark` varchar(100) DEFAULT NULL COMMENT '备注',
-  PRIMARY KEY (`id`),
-  KEY `FK9q28ewrhntqeipl1t04kh1be7` (`role_id`),
-  KEY `FKomxrs8a388bknvhjokh440waq` (`permission_id`),
-  CONSTRAINT `FK9q28ewrhntqeipl1t04kh1be7` FOREIGN KEY (`role_id`) REFERENCES `sys_role` (`id`),
-  CONSTRAINT `FKomxrs8a388bknvhjokh440waq` FOREIGN KEY (`permission_id`) REFERENCES `sys_permission` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='角色权限表';
 
 ```
@@ -166,11 +150,6 @@ INSERT INTO `sys_role_permission` (`permission_id`,`role_id`) VALUES (2,1);
 INSERT INTO `sys_role_permission` (`permission_id`,`role_id`) VALUES (3,2);
 INSERT INTO `sys_user_role` (`role_id`,`uid`) VALUES (1,1)
 ```
-
-
-
-
-
 ### Shiro配置
 
 首先要配置的是 ShiroConfig 类，Apache Shiro 核心通过 Filter 来实现，就好像 SpringMvc 通过 DispachServlet 来主控制一样。 既然是使用 Filter 一般也就能猜到，是通过 URL 规则来进行过滤和权限校验，所以我们需要定义一系列关于 URL 的规则和访问权限。
@@ -330,6 +309,7 @@ authorizationInfo.setStringPermissions(stringPermissions);
 #### 登录实现
 
 登录过程其实只是处理异常的相关信息，具体的登录验证交给 Shiro 来处理。
+
 ```
 @RequestMapping("/login")
 public String login(HttpServletRequest request, Map<String, Object> map) throws Exception{
@@ -358,4 +338,212 @@ public String login(HttpServletRequest request, Map<String, Object> map) throws 
     // 此方法不处理登录成功,由shiro进行处理
     return "/login";
 }
-···
+```
+
+
+#### 前后端分离
+由于现在前后端分离是开发趋势，我们在上面的方法中也没把前后端分离出来，所以接下来我们试试如何将前后端拆开来实现shiro。
+
+在配置文件ShiroConfig中,如果是权限不足，默认是跳转到某个页面中。
+
+```
+// 如果不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面
+shiroFilterFactoryBean.setLoginUrl("/admin/test");
+
+// 登录成功后要跳转的链接
+shiroFilterFactoryBean.setSuccessUrl("/docs.html");
+
+// 未授权界面
+shiroFilterFactoryBean.setUnauthorizedUrl("/unauthorized");****
+```
+但是现在页面都是由前端来控制展示，所以，在没有权限的时候，我们只需要返回不同的状态码给前端就可以了。
+
+如果是登录认证，那我们先自定义一个过滤器,继承shiro的登录认证过滤器：
+
+```
+import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
+import org.apache.shiro.web.util.WebUtils;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
+
+public class MyAuthenticationFilter  extends FormAuthenticationFilter {
+    @Override
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response)
+            throws Exception {
+        WebUtils.toHttp(response).sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        return false;
+    }
+}
+```
+然后在配置文件中将这个过滤器放在配置map中
+```
+Map<String, Filter> filterMap = shiroFilterFactoryBean.getFilters();
+        filterMap.put("authc", new MyAuthenticationFilter());
+```
+
+同样的如果需要自定义权限的过滤器,则继承自shiro的权限过滤器。
+
+```
+import org.apache.shiro.web.filter.authz.RolesAuthorizationFilter;
+import org.apache.shiro.web.util.WebUtils;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+public class MyPermissionFilter extends RolesAuthorizationFilter {
+
+    @Override
+    public boolean onAccessDenied(ServletRequest request, ServletResponse response, Object mappedValue) throws IOException {
+        WebUtils.toHttp(response).sendError(HttpServletResponse.SC_FORBIDDEN);
+        return false;
+    }
+}
+```
+再将这个过滤器配置到配置文件中就好了。
+
+这是完整的配置文件 ShiroConfig
+
+```
+package org.gdjz.config;
+
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
+import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.gdjz.shiro.Filter.MyAuthenticationFilter;
+import org.gdjz.shiro.Filter.MyPermissionFilter;
+import org.gdjz.shiro.MyRealm;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
+
+import javax.servlet.Filter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
+
+/**
+ * shiro 配置
+ *
+ * @author StevenGuo
+ * @date 17:12 2019/6/14
+ **/
+@Configuration
+public class ShiroConfig {
+
+    @Bean
+    HashedCredentialsMatcher hashedCredentialsMatcher() {
+        HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
+        hashedCredentialsMatcher.setHashAlgorithmName("MD5");
+        hashedCredentialsMatcher.setHashIterations(1);
+        return hashedCredentialsMatcher;
+    }
+
+    @Bean
+    MyRealm myRealm() {
+        MyRealm myRealm = new MyRealm();
+        myRealm.setCredentialsMatcher(hashedCredentialsMatcher());
+        return myRealm;
+    }
+
+    @Bean
+    DefaultWebSecurityManager securityManager() {
+        DefaultWebSecurityManager manager = new DefaultWebSecurityManager();
+        manager.setRealm(myRealm());
+        return manager;
+    }
+
+    @Bean
+    ShiroFilterFactoryBean shiroFilterFactoryBean() {
+        ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
+        shiroFilterFactoryBean.setSecurityManager(securityManager());
+
+        Map<String, Filter> filterMap = shiroFilterFactoryBean.getFilters();
+        filterMap.put("roles", new MyPermissionFilter());
+        filterMap.put("authc", new MyAuthenticationFilter());
+
+        //拦截器.
+        Map<String,String> filterChainDefinitionMap = new LinkedHashMap<>();
+
+        // 配置不会被拦截的链接 顺序判断
+        //<!-- anon:所有url都可以匿名访问-->
+        filterChainDefinitionMap.put("/docs.html", "anon");
+        filterChainDefinitionMap.put("/back/user/backUser/login", "anon");
+        filterChainDefinitionMap.put("/back/user/backUser/getVerifyCode", "anon");
+
+        //配置退出 过滤器,其中的具体的退出代码Shiro已经替我们实现了
+        filterChainDefinitionMap.put("/back/user/backUser/logout", "logout");
+
+        //<!-- 过滤链定义，从上向下顺序执行，一般将/**放在最为下边 -->
+        //<!-- authc:所有url都必须认证通过才可以访问-->
+        /*
+         * anon：匿名用户可访问
+         * authc：认证用户可访问
+         * user：使用rememberMe可访问
+         * perms：对应权限可访问
+         * roles：对应角色权限可访问
+         **/
+
+        filterChainDefinitionMap.put("/back/overview/**", "roles[overview_role]");
+
+        filterChainDefinitionMap.put("/back/**", "authc");
+
+        // 如果不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面
+//        shiroFilterFactoryBean.setLoginUrl("/admin/test");
+
+        // 登录成功后要跳转的链接
+//        shiroFilterFactoryBean.setSuccessUrl("/docs.html");
+
+        // 未授权界面
+//        shiroFilterFactoryBean.setUnauthorizedUrl("/unauthorized");
+
+        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
+
+        return shiroFilterFactoryBean;
+    }
+
+    /**
+     * 开启shiro aop注解支持.
+     *
+     * @param securityManager
+     * @return
+     */
+    @Bean
+    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(SecurityManager securityManager) {
+        AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
+        authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
+        return authorizationAttributeSourceAdvisor;
+    }
+
+    @Bean(name = "simpleMappingExceptionResolver")
+    public SimpleMappingExceptionResolver
+    createSimpleMappingExceptionResolver() {
+        SimpleMappingExceptionResolver r = new SimpleMappingExceptionResolver();
+        Properties mappings = new Properties();
+        mappings.setProperty("DatabaseException", "databaseError");
+        mappings.setProperty("UnauthorizedException", "403");
+        r.setExceptionMappings(mappings);
+        r.setDefaultErrorView("error");
+        r.setExceptionAttribute("ex");
+        return r;
+    }
+
+}
+
+```
+
+#### 源码
+在配置权限的过滤器时，重写的是shiro权限过滤器里面的方法，后来在看shiro官网的源码时，才知道，如果是失败，就直接使用onAccessDenied方法就可以了。具体看参考链接第二条。
+
+#### 参考链接
+
+1. extends RolesAuthorizationFilter
+https://www.cnblogs.com/javaxiaoxin/p/7424078.html
+
+2. onAccessDenied官网源码解释 返回true和返回false的不同
+http://shiro.apache.org/static/1.4.1/apidocs/org/apache/shiro/web/filter/authz/RolesAuthorizationFilter.html
