@@ -30,10 +30,8 @@ ARTS是由[左耳朵耗子](http://weibo.com/haoel?s=6cm7D0)在其专栏[左耳�
 ```
 algorithm/            # 算法题目
 review/               # 英文阅读与翻译
-share/                # 读后感分享
-tip/                  # 算法和其他技术知识点总结
-Partners/             # 伙伴
-
+share/                # 读后感分享(读书笔记)
+tip/                  # 技术知识点总结
 ```
 每个目录下都会有时间排序文件夹，方便查看
 
