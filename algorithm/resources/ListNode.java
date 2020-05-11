@@ -1,4 +1,4 @@
-package com.steven.demo.algorithm;
+package resources;
 
 public class ListNode {
     ListNode next;
