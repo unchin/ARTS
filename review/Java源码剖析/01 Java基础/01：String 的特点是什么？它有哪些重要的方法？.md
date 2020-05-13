@@ -95,7 +95,7 @@ System.out.println(oInt instanceof String); // 返回 false
 
 还有一个和 equals() 比较类似的方法 equalsIgnoreCase()，它是用于忽略字符串的大小写之后进行字符串对比。
 
-### compareTo() 比较两个字符串
+### 3. compareTo() 比较两个字符串
 compareTo() 方法用于比较两个字符串，返回的结果为 int 类型的值，源码如下：
 
 ```
