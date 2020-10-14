@@ -342,4 +342,4 @@ pool-1-thread-1 | after | time=4570328636800 | 耗时：0.169 毫秒
 ```
 
 ## 小结
-最后我们总结一下：线程池的使用必须要通过 ThreadPoolExecutor 的方式来创建，这样才可以更加明确线程池的运行规则，规避资源耗尽的风险。同时，也介绍了 ThreadPoolExecutor 的七大核心参数，包括核心线程数和最大线程数之间的区别，当线程池的任务队列没有可用空间且线程池的线程数量已经达到了最大线程数时，则会执行拒绝策略，Java 自动的拒绝策略有 4 种，用户也可以通过重写 rejectedExecution() 来自定义拒绝策略，我们还可以通过重写 beforeExecute() 和 afterExecute() 来实现 ThreadPoolExecutor 的扩展功能。
+最后我们总结一下：线程池的使用必须要通过 ThreadPoolExecutor 的方式来创建，这样才可以更加明确线程池的运行规则，规避资源耗尽的风险。同时，也介绍了 ThreadPoolExecutor 的七大核心参数，包括核心线程数和最大线程数之间的区别，当线程池的任务队列没有可用空间且线程池的线程数量已经达到了最大线程数时，则会执行拒绝策略，Java 自带的拒绝策略有 4 种，用户也可以通过重写 rejectedExecution() 来自定义拒绝策略，我们还可以通过重写 beforeExecute() 和 afterExecute() 来实现 ThreadPoolExecutor 的扩展功能。
