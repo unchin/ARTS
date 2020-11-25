@@ -32,6 +32,8 @@ JDK Proxy 和 CGLib 的区别主要体现在以下几个方面：
 
 JDK Proxy 动态代理的实现无需引用第三方类，只需要实现 InvocationHandler 接口，重写 invoke() 方法即可，整个实现代码如下所示：
 
+
+
 ```
 import java.lang.reflect.InvocationHandler;
 
