@@ -246,11 +246,62 @@ Filter Chain 定义说明：
 该方法主要执行以下操作:
 
 - 1、检查提交的进行认证的令牌信息
+
 - 2、根据令牌信息从数据源(通常为数据库)中获取用户信息
+
 - 3、对用户信息进行匹配验证。
+
 - 4、验证通过将返回一个封装了用户信息的AuthenticationInfo实例。
+
 - 5、验证失败则抛出AuthenticationException异常信息。
+
+  
+
 而在我们的应用程序中要做的就是自定义一个 Realm 类，继承AuthorizingRealm 抽象类，重载 doGetAuthenticationInfo()，重写获取用户信息的方法。
+
+### MyShiroRealm
+
+```
+
+/**
+ * 自定义Realm实现认证和鉴权
+ */
+public class MyShiroRealm extends org.apache.shiro.realm.AuthorizingRealm {
+    
+    @Autowired
+    private ClientAccountService clientAccountService;
+
+    /**
+     * 认证
+     *
+     * @param authenticationToken
+     * @return
+     * @throws AuthenticationException
+     */
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) {
+        String accountName = (String) authenticationToken.getPrincipal();
+        ClientAccount clientAccount = clientAccountService.getClientAccountByAccountName(accountName);
+        if (clientAccount == null) {
+            return null;
+        } else {
+            return new SimpleAuthenticationInfo(clientAccount, clientAccount.getPassword(), getName());
+        }
+    }
+
+    /**
+     * 鉴权
+     *
+     * @param principalCollection
+     * @return
+     */
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
+        return null;
+    }
+}
+
+```
 
 doGetAuthenticationInfo 的重写
 
