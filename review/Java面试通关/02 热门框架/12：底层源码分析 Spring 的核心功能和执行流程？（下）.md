@@ -1,4 +1,6 @@
-上一课时我们讲了 Bean 相关的内容，它其实也是属于 IoC 的具体实现之一，本课时我们就来讲讲 Spring 中其他几个高频的面试点，希望能起到抛砖引玉的作用，能为你理解 Spring 打开一扇门。因为 Spring 涉及的内容和知识点太多了，用它来写一本书也绰绰有余，因此这里我们只讲核心的内容，希望下来你能查漏补缺，完善自己的 Spring 技术栈。
+上一课时我们讲了 Bean 相关的内容，它其实也是属于 IoC 的具体实现之一，本课时我们就来讲讲 Spring 中其他几个高频的面试点，希望能起到抛砖引玉的作用，能为你理解 Spring 打开一扇门。
+
+因为 Spring 涉及的内容和知识点太多了，用它来写一本书也绰绰有余，因此这里我们只讲核心的内容，希望下来你能查漏补缺，完善自己的 Spring 技术栈。
 
 我们本课时的面试题是，谈一谈你对 IoC 和 DI 的理解。
 
@@ -45,8 +47,6 @@ IoC 的注入方式有三种：构造方法注入、Setter 注入和接口注入
 
 构造方法注入主要是依赖于构造方法去实现，构造方法可以是有参的也可以是无参的，我们平时 new 对象时就是通过类的构造方法来创建类对象的，每个类对象默认会有一个无参的构造方法，Spring 通过构造方法注入的代码示例如下：
 
-复制代码
-
 ```java
 public class Person {
     public Person() {
@@ -63,8 +63,6 @@ public class Person {
 
 applicationContext.xml 配置如下：
 
-复制代码
-
 ```html
 <bean id="person" class="org.springframework.beans.Person">
     <constructor-arg value="1" type="int"></constructor-arg>
@@ -75,8 +73,6 @@ applicationContext.xml 配置如下：
 **② Setter 注入**
 
 Setter 方法注入的方式是目前 Spring 主流的注入方式，它可以利用 Java Bean 规范所定义的 Setter/Getter 方法来完成注入，可读性和灵活性都很高，它不需要使用声明式构造方法，而是使用 Setter 注入直接设置相关的值，实现示例如下：
-
-复制代码
 
 ```html
 <bean id="person" class="org.springframework.beans.Person">
@@ -105,8 +101,6 @@ Spring AOP 目前提供了三种配置方式：
 
 我们先来定义一个实体类，代码如下：
 
-复制代码
-
 ```java
 package org.springframework.beans;
 public class Person {
@@ -129,8 +123,6 @@ public class Person {
 
 再定义一个 advice 类，用于对拦截方法的调用之前和调用之后进行相关的业务处理，实现代码如下：
 
-复制代码
-
 ```java
 import org.springframework.aop.AfterReturningAdvice;
 import org.springframework.aop.MethodBeforeAdvice;
@@ -148,8 +140,6 @@ public class MyAdvice implements MethodBeforeAdvice, AfterReturningAdvice {
 
 然后需要在 application.xml 文件中配置相应的拦截规则，配置如下：
 
-复制代码
-
 ```html
 <!-- 定义 advisor -->
 <bean id="myAdvice" class="org.springframework.advice.MyAdvice"></bean>
@@ -166,8 +156,6 @@ public class MyAdvice implements MethodBeforeAdvice, AfterReturningAdvice {
 
 最后，我们使用测试代码来完成调用：
 
-复制代码
-
 ```java
 public class MyApplication {
    public static void main(String[] args) {
@@ -181,8 +169,6 @@ public class MyApplication {
 
 以上程序的执行结果为：
 
-复制代码
-
 ```java
 准备执行方法: findPerson
 findPerson 被执行
@@ -194,8 +180,6 @@ findPerson 方法执行结束
 **② 基于 @AspectJ 注解的方式**
 
 首先需要在项目中添加 aspectjweaver 的 jar 包，配置如下：
-
-复制代码
 
 ```html
 <!-- https://mvnrepository.com/artifact/org.aspectj/aspectjweaver -->
@@ -210,15 +194,11 @@ findPerson 方法执行结束
 
 可以在 application.xml 配置如下代码中开启 @AspectJ 的注解：
 
-复制代码
-
 ```html
 <aop:aspectj-autoproxy/>
 ```
 
 也可以使用 @EnableAspectJAutoProxy 注解开启，代码如下：
-
-复制代码
 
 ```java
 @Configuration
@@ -228,8 +208,6 @@ public class AppConfig {
 ```
 
 之后我们需要声明拦截器的类和拦截方法，以及配置相应的拦截规则，代码如下：
-
-复制代码
 
 ```java
 import org.aspectj.lang.annotation.After;
@@ -253,15 +231,11 @@ public class MyAspectJ {
 
 然后我们只需要在 application.xml 配置中添加注解类，配置如下：
 
-复制代码
-
 ```java
 <bean class="org.springframework.advice.MyAspectJ"/>
 ```
 
 紧接着，我们添加一个需要拦截的方法：
-
-复制代码
 
 ```java
 package org.springframework.beans;
@@ -277,8 +251,6 @@ public class Person {
 ```
 
 最后，我们开启测试代码：
-
-复制代码
 
 ```java
 import org.springframework.beans.Person;
@@ -296,8 +268,6 @@ public class MyApplication {
 
 以上程序的执行结果为：
 
-复制代码
-
 ```java
 执行 doBefore 方法
 执行 findPerson 方法
@@ -309,8 +279,6 @@ public class MyApplication {
 **③ 基于 XML <aop /> 标签的方式**
 
 基于 XML 的方式与基于注解的方式类似，只是无需使用注解，把相关信息配置到 application.xml 中即可，配置如下：
-
-复制代码
 
 ```html
 <!-- 拦截处理类 -->
@@ -329,8 +297,6 @@ public class MyApplication {
 
 之后，添加一个普通的类来进行拦截业务的处理，实现代码如下：
 
-复制代码
-
 ```java
 public class MyPointcut {
    public void doBefore() {
@@ -346,8 +312,6 @@ public class MyPointcut {
 
 最后执行程序，执行结果为：
 
-复制代码
-
 ```java
 执行 doBefore 方法
 执行 findPerson 方法
@@ -357,8 +321,6 @@ public class MyPointcut {
 可以看出 AOP 拦截成功了。
 
 Spring AOP 的原理其实很简单，它其实就是一个动态代理，我们在调用 getBean() 方法的时候返回的其实是代理类的实例，而这个代理类在 Spring 中使用的是 JDK Proxy 或 CgLib 实现的，它的核心代码在 DefaultAopProxyFactory#createAopProxy(...) 中，源码如下：
-
-复制代码
 
 ```java
 public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
