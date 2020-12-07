@@ -16,8 +16,6 @@ SqlSession 是 MyBatis 中的重要 Java 接口，可以通过该接口来执行
 
 工厂模式应用解析：SqlSessionFactory 是一个接口类，它的子类 DefaultSqlSessionFactorys 有一个 openSession(ExecutorType execType) 的方法，其中使用了工厂模式，源码如下：
 
-复制代码
-
 ```java
 private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionIsolationLevel level, boolean autoCommit) {
     Transaction tx = null;
