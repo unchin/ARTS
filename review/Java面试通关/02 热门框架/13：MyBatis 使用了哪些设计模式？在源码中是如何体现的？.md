@@ -36,8 +36,6 @@ private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionI
 
 从该方法我们可以看出它会 configuration.newExecutor(tx, execType) 读取对应的环境配置，而此方法的源码如下：
 
-复制代码
-
 ```java
 public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
     executorType = executorType == null ? defaultExecutorType : executorType;
