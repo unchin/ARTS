@@ -70,8 +70,6 @@ public Executor newExecutor(Transaction transaction, ExecutorType executorType) 
 
 在 SqlSessionFactoryBuilder 中构建 SqlSessionFactory 对象的过程是这样的，首先需要通过 XMLConfigBuilder 对象读取并解析 XML 的配置文件，然后再将读取到的配置信息存入到 Configuration 类中，然后再通过 build 方法生成我们需要的 DefaultSqlSessionFactory 对象，实现源码如下（在 SqlSessionFactoryBuilder 类中）：
 
-复制代码
-
 ```java
 public SqlSessionFactory build(InputStream inputStream, String environment, Properties properties) {
     try {
@@ -107,8 +105,6 @@ ErrorContext 是线程级别的的单例，每个线程中有一个此对象的�
 
 ErrorContext 的实现源码如下：
 
-复制代码
-
 ```java
 public class ErrorContext {
   private static final String LINE_SEPARATOR = System.lineSeparator();
@@ -143,8 +139,6 @@ MyBatis 中的日志模块适配了以下多种日志类型：
 
 首先 MyBatis 定义了一个 Log 的接口，用于统一和规范接口的行为，源码如下：
 
-复制代码
-
 ```java
 public interface Log {
   boolean isDebugEnabled();
@@ -158,8 +152,6 @@ public interface Log {
 ```
 
 然后 MyBatis 定义了多个适配接口，例如 Log4j2 实现源码如下：
-
-复制代码
 
 ```java
 public class Log4j2Impl implements Log {
@@ -217,8 +209,6 @@ public class Log4j2Impl implements Log {
 
 MapperProxyFactory 的 newInstance() 方法就是生成一个具体的代理来实现功能的，源码如下：
 
-复制代码
-
 ```java
 public class MapperProxyFactory<T> {
   private final Class<T> mapperInterface;
@@ -266,15 +256,11 @@ public class MapperProxyFactory<T> {
 
 比如 doUpdate() 就是交给子类自己去实现的，它在 BaseExecutor 中的定义如下：
 
-复制代码
-
 ```java
 protected abstract int doUpdate(MappedStatement ms, Object parameter) throws SQLException;
 ```
 
 在 SimpleExecutor 中的实现如下：
-
-复制代码
 
 ```java
 public class SimpleExecutor extends BaseExecutor {
@@ -300,8 +286,6 @@ public class SimpleExecutor extends BaseExecutor {
 ```
 
 可以看出 SimpleExecutor 每次使用完 Statement 对象之后，都会把它关闭掉，而 ReuseExecutor 中的实现源码如下：
-
-复制代码
 
 ```java
 public class ReuseExecutor extends BaseExecutor {

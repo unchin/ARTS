@@ -14,8 +14,6 @@ Spring Boot 提供了更多的 Starters 用于快速构建业务框架，**Start
 
 例如在 Spring 中如果要创建 Web 应用程序的最小依赖项为：
 
-复制代码
-
 ```html
 <dependency>
     <groupId>org.springframework</groupId>
@@ -30,8 +28,6 @@ Spring Boot 提供了更多的 Starters 用于快速构建业务框架，**Start
 ```
 
 而 Spring Boot 只需要一个依赖项就可以来启动和运行 Web 应用程序，如下所示：
-
-复制代码
 
 ```html
 <dependency>
@@ -278,11 +274,5 @@ Spring Boot 启动时会打印 Banner 图片，如下图所示：
 ### 小结
 
 本课时首先讲了 Spring 和 Spring Boot 的区别，Spring Boot 本质上是 Spring 的延伸，它是基于 Spring 的，它为快速构建和开发 Spring 提供了有力的支撑；接着介绍了 Spring Boot 的四大特性：更快速的构建能力、起步依赖、内嵌容器支持、Actuator 监控支持等，最后 还介绍了 Spring Boot 启动的 18 个步骤。
-
- 
-
-00:00
-
- Java 源码剖析 34 讲
 
  
