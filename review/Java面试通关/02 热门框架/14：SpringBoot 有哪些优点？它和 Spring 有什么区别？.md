@@ -131,8 +131,6 @@ Actuator 提供了 19 个接口，接口请求地址和代表含义如下表所�
 
 我们知道 Spring Boot 程序的入口是 SpringApplication.run(Application.class, args) 方法，那么就从 run() 方法开始分析吧，它的源码如下：
 
-复制代码
-
 ```js
 public ConfigurableApplicationContext run(String... args) {
     // 1.创建并启动计时监控类
