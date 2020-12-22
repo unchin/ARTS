@@ -88,16 +88,12 @@ redis latest 235592615444 13 days ago 104MB
 
 有了镜像之后我们就可以使用 docker run 来**创建并运行容器**了，使用命令如下：
 
-复制代码
-
 ```
 $ docker run --name myredis -d redis
 22f560251e68b5afb5b7b52e202dcb3d47327f2136700d5a17bca7e37fc486bf
 ```
 
 查看运行中的容器，命令如下：
-
-复制代码
 
 ```
 ￥ docker ps
@@ -107,8 +103,6 @@ CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES
 
 其中，“myredis”为容器的名称，“6379/tcp”为 Redis 的端口号，容器的 ID 为“22f560251e68”。
 最后我们使用如下命令来连接 Redis：
-
-复制代码
 
 ```
 $ docker  exec -it myredis  redis-cli
