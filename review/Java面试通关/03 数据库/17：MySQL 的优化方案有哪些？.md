@@ -121,8 +121,6 @@ MySQL 性能优化的方案很多，因此它可以全面考察的一个程序�
 
 explain 执行计划的使用示例 SQL 如下：
 
-复制代码
-
 ```java
 explain select * from person where uname = 'Java';
 ```
