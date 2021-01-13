@@ -39,8 +39,6 @@ MySQL 数据库常见的**优化手段分为三个层面：SQL 和索引优化�
 
 我们要尽量使用小表驱动大表的方式进行查询，也就是如果 B 表的数据小于 A 表的数据，那执行的顺序就是先查 B 表再查 A 表，具体查询语句如下：
 
-复制代码
-
 ```java
 select name from A where id in (select id from B);
 ```
