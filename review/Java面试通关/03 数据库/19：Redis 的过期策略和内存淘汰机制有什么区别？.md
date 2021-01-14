@@ -14,8 +14,6 @@ Redis 和 MySQL 是面试绕不过的两座大山，他们一个是关系型数�
 
 惰性删除的源码位于 src/db.c 文件的 expireIfNeeded 方法中，如下所示：
 
-复制代码
-
 ```java
 int expireIfNeeded(redisDb *db, robj *key) {
     // 判断键是否过期
