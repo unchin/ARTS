@@ -159,8 +159,6 @@ void activeExpireCycle(int type) {
 
 我们可以使用 config get maxmemory-policy 命令，来查看当前 Redis 的内存淘汰策略，示例代码如下：
 
-复制代码
-
 ```java
 127.0.0.1:6379> config get maxmemory-policy
 1) "maxmemory-policy"
