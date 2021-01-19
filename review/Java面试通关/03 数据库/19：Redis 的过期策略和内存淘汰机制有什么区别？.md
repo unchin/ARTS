@@ -62,8 +62,6 @@ long long getExpire(redisDb *db, robj *key) {
 
 定期删除的源码在 expire.c 文件的 activeExpireCycle 方法中，如下所示：
 
-复制代码
-
 ```java
 void activeExpireCycle(int type) {
     static unsigned int current_db = 0; /* 上次定期删除遍历到的数据库ID */

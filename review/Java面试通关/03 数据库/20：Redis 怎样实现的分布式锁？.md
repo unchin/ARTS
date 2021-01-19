@@ -48,8 +48,6 @@
 
 使用 Redis 实现分布式锁主要需要使用 setnx 方法，也就是 set if not exists（不存在则创建），具体的实现代码如下：
 
-复制代码
-
 ```java
 127.0.0.1:6379> setnx lock true
 (integer) 1 #创建锁成功
