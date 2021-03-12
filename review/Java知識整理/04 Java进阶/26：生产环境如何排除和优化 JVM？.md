@@ -14,7 +14,6 @@
 
 jps（JVM Process Status tool，虚拟机进程状况工具）它的功能和 Linux 中的 ps 命令比较类似，用于列出正在运行的 JVM 的 LVMID（Local Virtual Machine IDentifier，本地虚拟机唯一 ID），以及 JVM 的执行主类、JVM 启动参数等信息。语法如下：
 
-复制代码
 
 ```java
 jps [options] [hostid]
@@ -29,7 +28,6 @@ jps [options] [hostid]
 
 使用实例：
 
-复制代码
 
 ```powershell
 ➜  jps -l
@@ -64,7 +62,6 @@ jstat（JVM Statistics Monitoring Tool，虚拟机统计信息监视工具）用
 
 例如，我们用它来查询某个 Java 进程的垃圾收集情况，示例如下：
 
-复制代码
 
 ```java
 ➜  jstat -gc 43704
