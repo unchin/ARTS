@@ -22,8 +22,6 @@ JVM 的种类有很多，比如 HotSpot 虚拟机，它是 Sun/OracleJDK 和 Ope
 
 比如以下代码中的 sb 对象的逃逸：
 
-复制代码
-
 ```java
 public static StringBuffer createString() {
     StringBuffer sb = new StringBuffer();
@@ -35,7 +33,6 @@ public static StringBuffer createString() {
 sb 虽然是一个局部变量，但上述代码可以看出，它被直接 return 出去了，因此可能被赋值给了其他变量，并且被完全修改，于是此 sb 就逃逸到了方法外部。
 想要 sb 变量不逃逸也很简单，可以改为如下代码：
 
-复制代码
 
 ```java
 public static String createString() {
