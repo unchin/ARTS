@@ -1,4 +1,6 @@
-package com.steven.demo.algorithm;
+package resources;
+
+import resources.ListNode;
 
 public class MergeTwoSortedLists {
 
